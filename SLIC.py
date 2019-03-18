@@ -17,6 +17,7 @@ def superPixel(img, K):
     N = len(img) * len(img[0])
     S = int(round(math.sqrt(N/K)))
     k_values = np.arange(1, K, S)
+    val = m/S
     #k_values = [int(round(k)) for k in k_values]
     #print(k_values)
     l, a, b = cv2.split(img)
@@ -26,20 +27,33 @@ def superPixel(img, K):
         kx = int((k - ky) / len(img[0]))
         C.append([l[kx][ky], a[kx][ky], b[kx][ky], kx, ky])
     #print (C)
-    D_s = [[0] * len(img[0])] * len(img)
-    for k in range(len(C)):
+    print ("4S:", 4*S)
+    D_s = [[float('inf')] * len(img[0])] * len(img)
+    for k in range(2):#len(C)):
         ky = k % len(img[0])
         kx = int((k - ky) / len(img[0]))
+        c0 = C[k][0]
+        c1 = C[k][1]
+        c2 = C[k][2]
+        c3 = C[k][3]
+        c4 = C[k][4]
         #specify start as 0 or kx-2*S
-        for i in range(kx-2*S, kx+2*S):
-            for j in range(ky-2*S, ky+2*S):
-                print (kx, ky, i, j)
-                d_lab = math.sqrt((C[k][0] - l[i][j])**2 + (C[k][1] - a[i][j])**2 + (C[k][2] - b[i][j])**2)
-                d_xy = math.sqrt((C[k][3] - i)**2 + (C[k][4] - j)**2)
-                d_s = d_lab + (m/S)*d_xy
+        istart = kx-2*S if (kx-2*S) >= 0 else 0
+        iend = kx+2*S if (kx+2*S) < len(img) else len(img) - 1
+        jstart = ky-2*S if (ky-2*S) >= 0 else 0
+        jend = ky+2*S if (ky+2*S) < len(img[0]) else len(img[0]) - 1
+        print (istart, iend, jstart, jend)
+        for i in range(istart, iend):
+            #print (istart, iend, jstart, jend)
+            for j in range(jstart, jend):
+                #print (i, j)
+                d_lab = math.sqrt((c0 - l[i][j])**2 + (c1 - a[i][j])**2 + (c2 - b[i][j])**2)
+                d_xy = math.sqrt((c3 - i)**2 + (c4 - j)**2)
+                d_s = d_lab + val*d_xy
+                #print (d_lab, d_xy, d_s)
                 if (d_s < D_s[i][j]):
                     D_s[i][j] = d_s
-    #print (D_s[:12][:11])
+    #print (D_s[:100][:100])
 
 def SLIC(img):
     l, a, b = cv2.split(img)
