@@ -61,7 +61,9 @@ ycrcb_scaled = np.uint8(255.*(ycrcb - ycrcb.min())/(ycrcb.max() - ycrcb.min()))
 
 matrix1 = np.column_stack((b.flatten(), v.flatten(), cr.flatten()))
 matrix2 = np.column_stack((a.flatten(), u.flatten(), cb.flatten()))
-
+#print (matrix1[:, 0])
+new_col = np.random.permutation(matrix1[:, 0])
+#print(new_col[:100])
 #print(len(img), len(img[0]))
 #print (matrix1)
 
@@ -76,7 +78,7 @@ for rank in range(3, 4):
     svd_decomp = np.matrix(lu[:, :rank]) * np.diag(ls[:rank]) * np.matrix(lvh[:rank, :])
     mofified_svd = np.array(svd_decomp.flatten())[0]
     print (len(I), len(I[0]), len(mofified_svd))
-    I = np.hstack((I, mofified_svd))
+    #I = np.hstack((I, mofified_svd))
     #np.append(I, svd_decomp.flatten(), axis=1)
     #print(svd_decomp)
     rank_name = str(rank)
@@ -86,7 +88,7 @@ for rank in range(3, 4):
     os.remove(file_name + "_decomp.npy")
     
     col += 1
-print ([row[0] for row in I])
+#print ([row[0] for row in I])
     #lu, ls, lvh = np.linalg.svd(svd_decomp, full_matrices=True)
 #print(np.allclose(l_svd, np.dot(lu[:, :l.shape[1]] * ls, lvh)))
 #smat = np.zeros((lu.shape, lvh.shape), dtype=complex)
