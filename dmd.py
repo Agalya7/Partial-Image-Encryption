@@ -30,7 +30,7 @@ def dmd(X, Y, truncate=None):
     V = Vh2.conj().T[:,:r]
     Atil = dot(dot(dot(U.conj().T, Y), V), inv(Sig)) # build A tilde
     mu,W = eig(Atil)
-    Phi = dot(dot(dot(Y, V), inv(Sig)), W) # build DMD modes
+    Phi = dot(dot(dot(Y, V), inv(Sig)), W) # build DMD modes (eigen vectors)
     return mu, Phi
 
 def check_dmd_result(X, Y, mu, Phi, show_warning=True):
@@ -71,6 +71,16 @@ for rank in range(3, 21):
     scipy.misc.imsave(img_name + "_decomp.png", svd_decomp)
     os.remove(img_name + "_decomp.npy")
 I = I.transpose()
+#print (len(I), len(I[0]), I.shape)
+#for row in I:
+#    yield row + [0] * (len(I) - len(row))
+#for i in range(len(I), len(I)):
+#    yield [0] * len(I)
+#new_I = np.zeros((len(I), len(I)))
+#print(I.shape[0] - I.shape[1])
+#for i in range(I.shape[0] - I.shape[1]):
+#    I = np.column_stack((I, np.zeros(I.shape[0], )))
+print (len(I), len(I[0]), I.shape)
 #print (len(I), len(I[0]), len(matrix), len(matrix[0]), I.shape[1]//matrix.shape[1] - 1)
 for i in range( I.shape[1]//matrix.shape[1] - 1):
     matrix = np.column_stack((matrix, np.random.permutation(b.flatten()), 
@@ -79,5 +89,13 @@ for i in range( I.shape[1]//matrix.shape[1] - 1):
                               np.random.permutation(a.flatten()), 
                               np.random.permutation(u.flatten()), 
                               np.random.permutation(cb.flatten())))
+#eigenvalues, eigenvectors -> mu, phi
 mu, phi = dmd(matrix, I)
-print (mu)
+mu = mu.real
+phi = phi.real
+inv_phi = np.linalg.pinv(phi)
+mu = np.diag(mu)
+print (phi.shape, mu.shape, inv_phi.shape)
+a = dot(phi, mu)
+print (phi.dtype, mu.dtype, a.dtype)
+#img = dot(a, inv_phi)
