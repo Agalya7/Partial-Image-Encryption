@@ -40,7 +40,7 @@ def check_dmd_result(X, Y, mu, Phi, show_warning=True):
 
 img_name = "img03"
 img = np.float32(cv2.imread(img_name + ".jpg", cv2.IMREAD_COLOR))/255
-
+print (img.shape)
 lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 l, a, b = cv2.split(lab)
 #lab_scaled = np.uint8(255.*(lab - lab.min())/(lab.max() - lab.min()))
@@ -95,7 +95,25 @@ mu = mu.real
 phi = phi.real
 inv_phi = np.linalg.pinv(phi)
 mu = np.diag(mu)
-print (phi.shape, mu.shape, inv_phi.shape)
-a = dot(phi, mu)
+print (phi.shape, mu.shape, inv_phi.shape, len(phi), len(phi[0]), len(phi[0][0]))
+#a = dot(phi, mu)
 print (phi.dtype, mu.dtype, a.dtype)
+new_phi = np.zeros((img.shape[0], img.shape[1]))
+row = 0
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        new_phi[i][j] = phi[row][0][0]
+        row += 1
+print (row)
+scipy.misc.imsave("phi.png", phi)
 #img = dot(a, inv_phi)
+#f = open("matrix.txt", "w")
+#print (a.shape[0], inv_phi.shape[1])
+#for i in range(a.shape[0]):
+#    prd = []
+#    for j in range(inv_phi.shape[1]):
+#        prd.append(dot(a[i], inv_phi[:, j]))
+#        for item in prd:
+#            f.write("%s " % item)
+#    f.write("\n")
+#f.close()
