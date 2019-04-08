@@ -14,6 +14,8 @@ from pyDes import *
 import random
 import string
 
+#takes a string as input and returns a list
+#'[1, 2][3, 4]' -> [1, 2, 3, 4]
 def StringToList(str_pixel):
     str_pixel = str_pixel[1:-1]
     pixels = []
@@ -32,9 +34,8 @@ def PlotImage(pixels, shape):
         img[x][y] = intensity
     plt.imshow(img)
 
-def AESAlgoDecrypt(encrypted):
+def AESAlgoDecrypt(encrypted, key):
     print ("Calling AES decryption")
-    key = b'6#26FRL$ZWD5GS4H'
     a = list(map(chr, range(48, 57)))
     b = list(string.ascii_lowercase)
     c = list(string.ascii_uppercase)
@@ -47,27 +48,26 @@ def AESAlgoDecrypt(encrypted):
     str_pixel = cfb_decipher.decrypt(encrypted)
     return str_pixel
 
-def BlowfishAlgoDecrypt(encrypted):
+def BlowfishAlgoDecrypt(encrypted, key):
     print ("Calling Blowfish decryption")
-    key = b'6#26FRL$ZWD'
     cipher  = Blowfish.new(key, Blowfish.MODE_ECB)
     str_pixel = cipher.decrypt(encrypted)
     return str_pixel
 
-def TripleDESAlgoDecrypt(encrypted):
+def TripleDESAlgoDecrypt(encrypted, key):
     print ("Calling TripleDES decryption")
-    key = b'6#26FRL$'
+    key = key[:8]
     cipher = des("DESCRYPT", CBC, key, pad=None, padmode=PAD_PKCS5)
     str_pixel = cipher.decrypt(encrypted, padmode=PAD_PKCS5)
     return str_pixel
 
-def GotoDecryptAlgo(algo, temp):
+def GotoDecryptAlgo(algo, temp, key):
     if (algo == 0):
-        return AESAlgoDecrypt(temp)
+        return AESAlgoDecrypt(temp, key)
     elif (algo == 1):
-        return BlowfishAlgoDecrypt(temp)
+        return BlowfishAlgoDecrypt(temp, key)
     else:
-        return TripleDESAlgoDecrypt(temp)
+        return TripleDESAlgoDecrypt(temp, key)
 
 f2 = open("encrypted.txt", "r")
 content = f2.read()
@@ -78,9 +78,10 @@ content = content[1]
 
 splitted = content.split('---')[:-1]
 decrypted = []
+key = b'6#26FRL$ZWD5GS4H'
 algo = 0
 for each in splitted:
-    temp = GotoDecryptAlgo(algo, each)
+    temp = GotoDecryptAlgo(algo, each, key)
     decrypted.append(temp)
     algo += 1
     
