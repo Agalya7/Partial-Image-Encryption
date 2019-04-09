@@ -56,9 +56,7 @@ def AESAlgoEncrypt(salient_region, key):
     c = list(string.ascii_uppercase)
     random.seed(3)
     sample = random.sample(a+b+c, 16)
-    iv = ""
-    for i in range(16):
-        iv += sample[i]
+    iv = ''.join(sample)
     cfb_cipher = AES.new(key, AES.MODE_CFB, iv)
     str_pixel = ListToString(salient_region)
     encrypted = cfb_cipher.encrypt(str_pixel)
@@ -93,18 +91,26 @@ def BlowfishAlgoEncrypt(salient_region, key):
 def TripleDESAlgoEncrypt(salient_region, key):
     print ("Calling TripleDES encryption")
     str_pixel = ListToString(salient_region)
-    key = key[:8]
     cipher = des("DESCRYPT", CBC, key, pad=None, padmode=PAD_PKCS5)
     encrypted = cipher.encrypt(str_pixel)
     return encrypted
 
-def GotoEncryptAlgo(algo, temp, key):
+def GotoEncryptAlgo(algo, temp, limit):
+    seed1 = 4234
+    seed2 = 6736
+    seed3 = 7452
+    random.seed(seed1)
+    key1 = ''.join(random.sample(limit, 16))
+    random.seed(seed2)
+    key2 = ''.join(random.sample(limit, 16))
+    random.seed(seed3)
+    key3 = ''.join(random.sample(limit, 8))
     if (algo == 0):
-        return AESAlgoEncrypt(temp, key)
+        return AESAlgoEncrypt(temp, key1)
     elif (algo == 1):
-        return BlowfishAlgoEncrypt(temp, key)
+        return BlowfishAlgoEncrypt(temp, key2)
     else:
-        return TripleDESAlgoEncrypt(temp, key)
+        return TripleDESAlgoEncrypt(temp, key3)
 
 #read image and split based on color space
 img_name = "img02"
@@ -124,7 +130,10 @@ print "Number of segments:", length
 algorithm = np.zeros((len(salient_region)))
 for i in range(len(algorithm)):
     algorithm[i] = random.randint(0, 9999) % length
-key = b'6#26FRL$ZWD5GS4H'
+a = list(map(chr, range(48, 57)))
+b = list(string.ascii_lowercase)
+c = list(string.ascii_uppercase)
+limit = a + b + c
 
 enc = ""
 for algo in range(length):
@@ -132,7 +141,7 @@ for algo in range(length):
     for j in range(len(algorithm)):
         if (algorithm[j] == algo):
             temp.append(salient_region[j])
-    temp = GotoEncryptAlgo(algo, temp, key)
+    temp = GotoEncryptAlgo(algo, temp, limit)
     enc += temp + "---"
 
 enc = str(img.shape) + "*-+" + enc
