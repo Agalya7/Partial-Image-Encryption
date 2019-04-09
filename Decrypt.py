@@ -13,6 +13,7 @@ from Crypto.Cipher import Blowfish
 from pyDes import *
 import random
 import string
+import scipy.misc
 
 #takes a string as input and returns a list
 #'[1, 2][3, 4]' -> [1, 2, 3, 4]
@@ -56,18 +57,26 @@ def BlowfishAlgoDecrypt(encrypted, key):
 
 def TripleDESAlgoDecrypt(encrypted, key):
     print ("Calling TripleDES decryption")
-    key = key[:8]
     cipher = des("DESCRYPT", CBC, key, pad=None, padmode=PAD_PKCS5)
     str_pixel = cipher.decrypt(encrypted, padmode=PAD_PKCS5)
     return str_pixel
 
-def GotoDecryptAlgo(algo, temp, key):
+def GotoDecryptAlgo(algo, temp, limit):
+    seed1 = 4234
+    seed2 = 6736
+    seed3 = 7452
+    random.seed(seed1)
+    key1 = ''.join(random.sample(limit, 16))
+    random.seed(seed2)
+    key2 = ''.join(random.sample(limit, 16))
+    random.seed(seed3)
+    key3 = ''.join(random.sample(limit, 8))
     if (algo == 0):
-        return AESAlgoDecrypt(temp, key)
+        return AESAlgoDecrypt(temp, key1)
     elif (algo == 1):
-        return BlowfishAlgoDecrypt(temp, key)
+        return BlowfishAlgoDecrypt(temp, key2)
     else:
-        return TripleDESAlgoDecrypt(temp, key)
+        return TripleDESAlgoDecrypt(temp, key3)
 
 f2 = open("encrypted.txt", "r")
 content = f2.read()
@@ -78,10 +87,13 @@ content = content[1]
 
 splitted = content.split('---')[:-1]
 decrypted = []
-key = b'6#26FRL$ZWD5GS4H'
+a = list(map(chr, range(48, 57)))
+b = list(string.ascii_lowercase)
+c = list(string.ascii_uppercase)
+limit = a + b + c
 algo = 0
 for each in splitted:
-    temp = GotoDecryptAlgo(algo, each, key)
+    temp = GotoDecryptAlgo(algo, each, limit)
     decrypted.append(temp)
     algo += 1
     
